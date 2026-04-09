@@ -32,6 +32,7 @@
             margin-top: 40px;
         }
 
+        /* This button uses the parent close function to go back home safely */
         .back-home-link {
             text-decoration: none;
             color: #4facfe;
@@ -41,7 +42,9 @@
             padding: 8px 15px;
             border: 1px solid #4facfe;
             border-radius: 20px;
+            cursor: pointer;
             transition: 0.3s;
+            background: transparent;
         }
 
         .back-home-link:hover {
@@ -224,7 +227,7 @@
     </div>
 
     <div class="header-nav">
-        <a href="https://realhome-74e.pages.dev" class="back-home-link">← Home</a>
+        <button onclick="window.parent.closeOverlay()" class="back-home-link">← Home</button>
         <h1 class="main-header">Requested Games</h1>
         <div style="width: 70px;"></div>
     </div>
@@ -239,25 +242,29 @@
             <h3>Request a Game</h3>
             <a href="https://forms.gle/xhWTy62fK1YqxNQA6" target="_blank" class="btn">Open Form</a>
         </div> 
-         <div class="card" data-name="Antimatter Dimensions">
+
+        <div class="card" data-name="Clover Pit">
             <h3>Clover Pit</h3>
-            <button class="btn" onclick="launch('Antimatter Dimensions', 'https://cloverpit.pages.dev')">Play Now</button>
+            <button class="btn" onclick="launch('Clover Pit', 'https://cloverpit.pages.dev')">Play Now</button>
         </div>
-        <div class="card" data-name="Antimatter Dimensions">
+
+        <div class="card" data-name="Dino-Bros">
             <h3>Dino-Bros</h3>
-            <button class="btn" onclick="launch('Antimatter Dimensions', 'https://dinobros.pages.dev')">Play Now</button>
+            <button class="btn" onclick="launch('Dino-Bros', 'https://dinobros.pages.dev')">Play Now</button>
         </div>
-        <div class="card" data-name="Antimatter Dimensions">
+
+        <div class="card" data-name="SchoolBoy Runaway">
             <h3>SchoolBoy Runaway</h3>
-            <button class="btn" onclick="launch('Antimatter Dimensions', 'https://schoolboy-runaway.pages.dev')">Play Now</button>
+            <button class="btn" onclick="launch('SchoolBoy Runaway', 'https://schoolboy-runaway.pages.dev')">Play Now</button>
         </div>
+
         <div class="card ubg-card" data-name="UBG Collection Unblocked Games">
             <h3>UBG Collection</h3>
             <div class="ubg-button-grid">
                 <button class="ubg-mini-btn" onclick="launch('UBG 1', 'https://ubg01.gitlab.io/')">UBG 1</button>
                 <button class="ubg-mini-btn" onclick="launch('UBG 2', 'https://ubg02.gitlab.io/')">UBG 2</button>
                 <button class="ubg-mini-btn" onclick="launch('UBG 3', 'https://ubg03.gitlab.io/')">UBG 3</button>
-                </div>
+            </div>
         </div>
 
         <div class="card" data-name="Antimatter Dimensions">
@@ -341,12 +348,10 @@
         let selectedRandom = { name: "", url: "" };
 
         function pickRandom() {
-            // Exclude the form and the UBG multi-box from randomizer for safety
             const cards = document.querySelectorAll('.card:not(.form-card):not(.ubg-card)');
             const randomCard = cards[Math.floor(Math.random() * cards.length)];
             
             selectedRandom.name = randomCard.getAttribute('data-name');
-            // Extract the URL from the button onclick string
             const btnClick = randomCard.querySelector('.btn').getAttribute('onclick');
             selectedRandom.url = btnClick.split("'")[3];
             
@@ -361,47 +366,12 @@
 
         function closeModal() { document.getElementById('modalOverlay').style.display = 'none'; }
 
-        // Core Launch Logic (Stealth Iframe + Panic Key)
+        // Updated Launch Logic: Talks to the Parent (Home Page)
         function launch(name, url) {
-            const content = `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>${name}</title>
-                    <link rel="icon" href="https://ssl.gstatic.com/docs/doclist/images/infinite_growth_customer_emails.png">
-                    <style>
-                        body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: #000; font-family: sans-serif; }
-                        iframe { border: none; width: 100%; height: 100%; }
-                        .back-btn {
-                            position: fixed; top: 15px; left: 15px;
-                            padding: 8px 16px; background: rgba(0, 0, 0, 0.5);
-                            color: white; border: 1px solid rgba(255, 255, 255, 0.2);
-                            border-radius: 20px; cursor: pointer; z-index: 99999;
-                            font-weight: bold; text-decoration: none; backdrop-filter: blur(4px);
-                            font-size: 13px; transition: 0.2s;
-                        }
-                        .back-btn:hover { background: rgba(255, 255, 255, 0.2); }
-                    </style>
-                </head>
-                <body>
-                    <a href="javascript:location.reload()" class="back-btn">← </a>
-                    <iframe src="${url}"></iframe>
-                    <script>
-                        window.addEventListener('keydown', function(e) {
-                            if (e.key.toLowerCase() === 'q') window.location.replace('https://classroom.google.com');
-                        });
-                    <\/script>
-                </body>
-                </html>`;
-            document.open();
-            document.write(content);
-            document.close();
+            // Uses the Home Page's launch function
+            // Passes 'false' at the end to hide the Back button while playing a game
+            window.parent.launch(name, url, 'https://ssl.gstatic.com/docs/doclist/images/infinite_growth_customer_emails.png', false);
         }
-
-        // Global Panic Key for Main Page
-        window.addEventListener('keydown', function(e) {
-            if (e.key.toLowerCase() === 'q') window.location.href = 'https://classroom.google.com';
-        });
     </script>
 </body>
 </html>
